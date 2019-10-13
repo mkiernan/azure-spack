@@ -5,8 +5,10 @@ packages:
       mpi: [intel-mpi, mpich, openmpi, mvapich2, hpcx]
       blas: [intel-mkl, openblas]
       lapack: [intel-mkl, openblas]
-  hdf5:
-    variants: +cxx +fortran +szip +threadsafe
+  gcc:
+    modules:
+      gcc@8.2.0: gcc-8.2.0
+    buildable: True
   intel-mpi:
     modules:
       intel-mpi@2018.4.274%gcc@8.2.0: mpi/impi_2018.4.274
@@ -27,6 +29,8 @@ packages:
     modules:
        hpcx@2.4.1: mpi/hpcx-v2.4.1
     buildable: False
+  hdf5:
+    variants: +cxx +fortran +szip +threadsafe
   elpa:
     variants: +openmp
   intel-mkl:

@@ -16,7 +16,7 @@ compilers:
     environment: {}
     extra_rpaths: []
     flags: {}
-    modules: []
+    modules: [gcc-8.2.0]
     operating_system: centos7
     paths:
       cc: /opt/gcc-8.2.0/bin/gcc
