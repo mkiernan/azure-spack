@@ -6,11 +6,12 @@ source ~/.bashrc
 #-- compilers
 ARCH=`spack arch`
 spack compilers
+spack install gcc@8.2.0  #-- already in /opt - see packages.yaml/compilers.yaml
 spack install gcc@9.2.0
 spack load gcc@9.2.0 arch=${ARCH}
 spack compiler find
 
-#-- mpi: use the Azure CentOS HPC image pre-installed modules
+#-- mpi: use the Azure CentOS HPC image pre-installed modules - see packages.yaml
 spack install openmpi@4.0.1%gcc@8.2.0
 spack install mvapich2@2.3.1%gcc@8.2.0
 spack install intel-mpi@2018.4.274%gcc@8.2.0

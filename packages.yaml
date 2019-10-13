@@ -5,23 +5,30 @@ packages:
       mpi: [intel-mpi, mpich, openmpi, mvapich2, hpcx]
       blas: [intel-mkl, openblas]
       lapack: [intel-mkl, openblas]
-  gcc:
-    modules:
-      gcc@8.2.0: gcc-8.2.0
-    buildable: True
+  hdf5:
+    variants: +cxx +fortran +szip +threadsafe
+#-- module environments don't seem to pick up paths correctly
   intel-mpi:
-    modules:
-      intel-mpi@2018.4.274%gcc@8.2.0: mpi/impi_2018.4.274
+    paths:
+      intel-mpi@2018.4.274%gcc@8.2.0: /opt/intel
+#    modules:
+#      intel-mpi@2018.4.274%gcc@8.2.0: mpi/impi_2018.4.274
     buildable: False
   mpich:
-    modules:
-      mpich@3.3%gcc@8.2.0: mpi/mpich-3.3
+    paths:
+       mpich@3.3%gcc@8.2.0: /opt/mpich-3.3
+#    modules:
+#      mpich@3.3%gcc@8.2.0: mpi/mpich-3.3
     buildable: False
   mvapich2:
-    modules:
-      mvapich2@2.3.1%gcc@8.2.0: mpi/mvapich2-2.3.1
+    paths:
+      mvapich2@2.3.1%gcc@8.2.0: /opt/mvapich2-2.3.1
+#    modules:
+#      mvapich2@2.3.1%gcc@8.2.0: mpi/mvapich2-2.3.1
     buildable: False
   openmpi:
+#    paths:
+#       openmpi@4.0.1%gcc@8.2.0: /opt/openmpi-4.0.1
     modules:
        openmpi@4.0.1%gcc@8.2.0: mpi/openmpi-4.0.1
     buildable: False
@@ -29,8 +36,6 @@ packages:
     modules:
        hpcx@2.4.1: mpi/hpcx-v2.4.1
     buildable: False
-  hdf5:
-    variants: +cxx +fortran +szip +threadsafe
   elpa:
     variants: +openmp
   intel-mkl:

@@ -22,3 +22,14 @@ $ ./azure-pkgs.sh
 ```
 
 More details on spack <a href="https://spack.readthedocs.io">here</a>
+
+Issues:
+
+Using the built-in mpi modules as modules in package.yaml leads to path issues. Workaround is to hardwire the path in the packages.yaml for now: 
+
+  intel-mpi:
+    paths:
+       intel-mpi@2018.4.274%gcc@8.2.0: /opt/intel
+#    modules:
+#      intel-mpi@2018.4.274%gcc@8.2.0: mpi/impi_2018.4.274
+    buildable: False
