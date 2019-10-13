@@ -1,0 +1,33 @@
+packages:
+  all:
+    compiler: [gcc@8.2.0, intel, clang]
+    providers:
+      mpi: [intel-mpi, mpich, openmpi, mvapich2, hpcx]
+      blas: [intel-mkl, openblas]
+      lapack: [intel-mkl, openblas]
+  hdf5:
+    variants: +cxx +fortran +szip +threadsafe
+  intel-mpi:
+    modules:
+      intel-mpi@2018.4.274%gcc@8.2.0: mpi/impi_2018.4.274
+    buildable: False
+  mpich:
+    modules:
+      mpich@3.3%gcc@8.2.0: mpi/mpich-3.3
+    buildable: False
+  mvapich2:
+    modules:
+      mvapich2@2.3.1%gcc@8.2.0: mpi/mvapich2-2.3.1
+    buildable: False
+  openmpi:
+    modules:
+       openmpi@4.0.1%gcc@8.2.0: mpi/openmpi-4.0.1
+    buildable: False
+  hpcx: 
+    modules:
+       hpcx@2.4.1: mpi/hpcx-v2.4.1
+    buildable: False
+  elpa:
+    variants: +openmp
+  intel-mkl:
+    variants: threads=openmp
