@@ -13,6 +13,8 @@ sed --in-place=.org 's/\# build_jobs: 16/build_jobs: 32/g' config.yaml
 popd
 
 mkdir -p ~/.spack/linux
+wget https://raw.githubusercontent.com/mkiernan/azure-spack/master/compilers.yaml
+wget https://raw.githubusercontent.com/mkiernan/azure-spack/master/packages.yaml
 cp compilers.yaml ~/.spack/linux
 cp packages.yaml ~/.spack
 
