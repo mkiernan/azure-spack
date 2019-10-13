@@ -1,5 +1,5 @@
 #!/bin/bash
-SPACKROOT=`pwd`
+SPACKINSTALLDIR=`pwd`
 git clone https://github.com/spack/spack.git
 # hack for missing clzero flg on HB60rs https://github.com/spack/spack/issues/12896
 pushd spack/lib/spack/llnl/util/cpu/
@@ -12,12 +12,13 @@ pushd spack/etc/spack/defaults/
 sed --in-place=.org 's/\# build_jobs: 16/build_jobs: 32/g' config.yaml
 popd
 
-mkdir -p ~/.spack/linux
+#-- set default compiler & package files
 wget https://raw.githubusercontent.com/mkiernan/azure-spack/master/compilers.yaml
 wget https://raw.githubusercontent.com/mkiernan/azure-spack/master/packages.yaml
+mkdir -p ~/.spack/linux
 cp compilers.yaml ~/.spack/linux
 cp packages.yaml ~/.spack
 
 #-- setup env
-echo ". ${SPACKROOT}/spack/share/spack/setup-env.sh" >> ~/.bashrc
+echo ". ${SPACKINSTALLDIR}/spack/share/spack/setup-env.sh" >> ~/.bashrc
 source ~/.bashrc
