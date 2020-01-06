@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -l walltime=24:00:00,select=2:ncpus=60:nodearray=HB60
+#PBS -l place=scatter
+
+module load osu-micro-benchmarks-5.6.1-gcc-9.2.0-woqu6jw
+module load openmpi-4.0.2-gcc-9.2.0-xnwsmui
+
+cd $PBS_O_WORKDIR
+
+#PKEY=`cat /sys/class/infiniband/mlx5_0/ports/1/pkeys/* | grep -v 0000 | grep -v 0x7fff`
+#PKEY=`echo "${PKEY/0x8/0x0}"`
+#echo "PKEY: $PKEY"
+mpirun -np 2 -N 1 -hostfile $PBS_NODEFILE --display-map -x PATH -x LD_LIBRARY_PATH -x UCX_NET_DEVICES=mlx5_0:1 osu_latency
+mpirun -np 2 -N 1 -hostfile $PBS_NODEFILE --display-map -x PATH -x LD_LIBRARY_PATH -x UCX_NET_DEVICES=mlx5_0:1 osu_bw
+mpirun -np 4 -N 2 -hostfile $PBS_NODEFILE --display-map -x PATH -x LD_LIBRARY_PATH -x UCX_NET_DEVICES=mlx5_0:1 osu_mbw_mr
+
+#mpirun -np 2 -N 1 -hostfile $PBS_NODEFILE --display-map -x PATH -x LD_LIBRARY_PATH -x UCX_NET_DEVICES=mlx5_0:1 -x UCX_IB_PKEY=$PKEY osu_latency
+#mpirun -np 2 -N 1 -hostfile $PBS_NODEFILE --display-map -x PATH -x LD_LIBRARY_PATH -x UCX_NET_DEVICES=mlx5_0:1 -x UCX_IB_PKEY=$PKEY osu_bw
+#mpirun -np 4 -N 2 -hostfile $PBS_NODEFILE --display-map -x PATH -x LD_LIBRARY_PATH -x UCX_NET_DEVICES=mlx5_0:1 -x UCX_IB_PKEY=$PKEY osu_mbw_mr
+

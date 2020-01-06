@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -l walltime=24:00:00,select=2:ncpus=60:nodearray=HB60
+#PBS -l place=scatter
+
+#module load mpi/mvapich2-2.3.2
+#module load gcc-9.2.0
+module load mvapich2-2.3.2-gcc-9.2.0-2qvp53h
+module load osu-micro-benchmarks-5.6.1-gcc-9.2.0-yivhjgh
+
+cd $PBS_O_WORKDIR
+
+#--- mpirun_rsh needs extra help with -export-all to pass the environment
+mpirun_rsh -ssh -export-all -np 2 -hostfile $PBS_NODEFILE osu_latency
+mpirun_rsh -ssh -export-all -np 2 -hostfile $PBS_NODEFILE osu_bw
+mpirun_rsh -ssh -export-all -np 4 -hostfile $PBS_NODEFILE osu_mbw_mr

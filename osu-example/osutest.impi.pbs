@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -l walltime=24:00:00,select=2:ncpus=60:nodearray=HB60
+#PBS -l place=scatter
+
+module load osu-micro-benchmarks-5.6.1-gcc-9.2.0-wi7h57l
+module load intel-mpi-2018.4.274-gcc-9.2.0-p67lz7t
+
+cd $PBS_O_WORKDIR
+
+mpirun -np 2 -ppn 1 -genv I_MPI_FABRICS=shm:ofa -genv I_MPI_FALLBACK_DEVICE=0 osu_latency
+mpirun -np 2 -ppn 1 -genv I_MPI_FABRICS=shm:ofa -genv I_MPI_FALLBACK_DEVICE=0 osu_bw
+mpirun -np 4 -ppn 2 -genv I_MPI_FABRICS=shm:ofa -genv I_MPI_FALLBACK_DEVICE=0 osu_mbw_mr

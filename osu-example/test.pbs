@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -l walltime=24:00:00,select=2:ncpus=44:nodearray=HC44
+#PBS -l place=scatter
+
+module load mpi/mvapich2-2.3.1
+module load gcc-8.2.0
+
+cd $PBS_O_WORKDIR
+#mpirun_rsh -np 2 -hostfile $PBS_NODEFILE MV2_CPU_MAPPING=48 /shared/home/mkiernan/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+#mpirun_rsh -ssh -np 2 -hostfile $PBS_NODEFILE MV2_ENABLE_AFFINITY=1 MV2_CPU_MAPPING=44 /opt/mvapich2-2.3.1/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+mpirun_rsh -ssh -np 2 -hostfile $PBS_NODEFILE MV2_ENABLE_AFFINITY=1 MV2_CPU_MAPPING=43 /opt/mvapich2-2.3.1/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency
+

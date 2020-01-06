@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -l walltime=24:00:00,select=8:ncpus=60:nodearray=HB60
+#PBS -l place=scatter
+
+module load osu-micro-benchmarks-5.6.1-gcc-9.2.0-woqu6jw
+module load openmpi-4.0.2-gcc-9.2.0-xnwsmui
+
+cd $PBS_O_WORKDIR
+
+mpirun -np 480 -N 60 -hostfile $PBS_NODEFILE -x PATH -x LD_LIBRARY_PATH -x UCX_NET_DEVICES=mlx5_0:1 UCX_RC_TM_ENABLE=y osu_multi_lat
+
+mpirun -np 480 -N 60 -hostfile $PBS_NODEFILE -mca coll_hcoll_enable 1 -mca coll_hcoll_np 10 -x PATH -x LD_LIBRARY_PATH -x HCOLL_MAIN_IB=mlx5_0:1 osu_barrier -f
