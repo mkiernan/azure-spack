@@ -1,6 +1,8 @@
 # azure-spack
 
-Setup scripts to get <a href="https://spack.readthedocs.io">Spack</a> running on the Azure HC44rs/HB60rs HPC platforms. The scripts are designed to be run on the Azure OpenLogic:CentOS-HPC:7.6:latest operating system image, which comes with all SR-IOV ready MPI flavours pre-installed in /opt as modules. 
+Setup scripts to get <a href="https://spack.readthedocs.io">Spack</a> running on the Azure HC44rs/HB60rs/HB120rs_v2 HPC platforms. These scripts are designed to be run on the Azure OpenLogic:CentOS-HPC:7.6 & 7.7:latest operating system images, which come with all SR-IOV ready MPI flavours pre-installed in /opt as modules. 
+
+The spack configuration builds on the built-in /opt image modules, building the applications against these. 
 
 ## Getting Started
 Download and run the azure-spack.sh script (with a normal non-root user account): 
@@ -17,20 +19,15 @@ linux-centos7-skylake
 ```
 
 Now you can go ahead and run the package installer (note this can take a long time). Edit the script and hash out the packages you are not interested in, then run it: 
+
 ```
 $ ./azure-pkgs.sh
 ```
-
+You may also need to edit the compiler.yaml, packages.yaml & modules.yaml to customize according to your preferences. 
 More details on spack <a href="https://spack.readthedocs.io">here</a>
 
-Issues:
+## Known Issues:
 
-Using the built-in mpi modules as modules in package.yaml leads to path issues. Workaround is to hardwire the path in the packages.yaml for now: 
-```
-  intel-mpi:
-    paths:
-       intel-mpi@2018.4.274%gcc@8.2.0: /opt/intel
-#    modules:
-#      intel-mpi@2018.4.274%gcc@8.2.0: mpi/impi_2018.4.274
-    buildable: False
-```
+1) Anything using Intel MPI 2019 must be built with -dirty to pickup libfabric from the modulefile until intel-mpi spack package is fixed for 2019/2020
+2) HPCX package is waiting on a fix to source the built-in modulefile
+3) Intel MPI 2018 & 2019 support up to gcc@8.2.0 (mainly for fortran dependent builds like hdf5)
