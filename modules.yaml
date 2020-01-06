@@ -1,0 +1,9 @@
+modules:
+  tcl:
+    all:
+      suffixes:
+        '^openmpi': openmpi
+        '^mvapich2': mvapich2
+        '^intel-mpi': intelmpi
+        '^mpich': mpich
+        '^hpx': hpx

@@ -16,12 +16,38 @@ compilers:
     environment: {}
     extra_rpaths: []
     flags: {}
-    modules: [gcc-8.2.0]
+    modules: [gcc-9.2.0]
     operating_system: centos7
     paths:
-      cc: /opt/gcc-8.2.0/bin/gcc
-      cxx: /opt/gcc-8.2.0/bin/g++
-      f77: /opt/gcc-8.2.0/bin/gfortran
-      fc: /opt/gcc-8.2.0/bin/gfortran
-    spec: gcc@8.2.0
+      cc: /opt/gcc-9.2.0/bin/gcc
+      cxx: /opt/gcc-9.2.0/bin/g++
+      f77: /opt/gcc-9.2.0/bin/gfortran
+      fc: /opt/gcc-9.2.0/bin/gfortran
+    spec: gcc@9.2.0
     target: x86_64
+- compiler:
+    paths:
+      cc: /shared/intel/compilers_and_libraries_2018.5.274/linux/bin/intel64/icc
+      cxx: /shared/intel/compilers_and_libraries_2018.5.274/linux/bin/intel64/icpc
+      f77: /shared/intel/compilers_and_libraries_2018.5.274/linux/bin/intel64/ifort
+      fc: /shared/intel/compilers_and_libraries_2018.5.274/linux/bin/intel64/ifort
+    operating_system: centos7
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: ['/shared/intel/compilers_and_libraries_2018.5.274/linux/compiler/lib/intel64_lin']
+    flags: {}
+    spec: intel@18.0.5
+- compiler:
+    paths:
+      cc: /shared/intel/compilers_and_libraries_2019.5.281/linux/bin/intel64/icc
+      cxx: /shared/intel/compilers_and_libraries_2019.5.281/linux/bin/intel64/icpc
+      f77: /shared/intel/compilers_and_libraries_2019.5.281/linux/bin/intel64/ifort
+      fc: /shared/intel/compilers_and_libraries_2019.5.281/linux/bin/intel64/ifort
+    operating_system: centos7
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+    flags: {}
+    spec: intel@19.0.5

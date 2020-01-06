@@ -1,42 +1,52 @@
 packages:
   all:
-    compiler: [gcc@8.2.0, intel, clang]
+    compiler: [gcc@9.2.0, intel]
     providers:
-      mpi: [intel-mpi, mpich, openmpi, mvapich2, hpcx]
+      mpi: [mvapich2, intel-mpi, hpcx, openmpi ]
       blas: [intel-mkl, openblas]
       lapack: [intel-mkl, openblas]
   hdf5:
-    variants: +cxx +fortran +szip +threadsafe
+    variants: +cxx +fortran +szip +threadsafe +mpi +hl
+  netcdf-c: 
+    variants: ~dap~hdf4 maxdims=1024 maxvars=8192 +mpi+parallel-netcdf+pic+shared
+  parallel-netcdf:
+    variants: ~cxx +fortran +pic
+  stream:
+    variants: +openmp
+  ior:
+    variants: +hdf5
+  hpl:
+    variants: +openmp
+#  ncurses:
+#    variants: ccflags="-std=c++11"
 #-- module environments don't seem to pick up paths correctly
   intel-mpi:
     paths:
-      intel-mpi@2018.4.274%gcc@8.2.0: /opt/intel
-#    modules:
-#      intel-mpi@2018.4.274%gcc@8.2.0: mpi/impi_2018.4.274
+       intel-mpi@2018.4.274: /opt/intel/compilers_and_libraries_2018.5.274/linux/mpi
+       intel-mpi@2019.5.281: /opt/intel/compilers_and_libraries_2019.5.281/linux/mpi
     buildable: False
-  mpich:
-    paths:
-       mpich@3.3%gcc@8.2.0: /opt/mpich-3.3
-#    modules:
-#      mpich@3.3%gcc@8.2.0: mpi/mpich-3.3
-    buildable: False
+#  mpich:
+#    paths:
+#       mpich@3.3%gcc@9.2.0: /opt/mpich-3.3
+#    buildable: False
   mvapich2:
-    paths:
-      mvapich2@2.3.1%gcc@8.2.0: /opt/mvapich2-2.3.1
-#    modules:
-#      mvapich2@2.3.1%gcc@8.2.0: mpi/mvapich2-2.3.1
+    modules:
+      mvapich2@2.3.2%gcc@9.2.0: mpi/mvapich2-2.3.2
+#    paths:
+#      mvapich2@2.3.2%gcc@9.2.0: /opt/mvapich2-2.3.2
     buildable: False
   openmpi:
-#    paths:
-#       openmpi@4.0.1%gcc@8.2.0: /opt/openmpi-4.0.1
     modules:
-       openmpi@4.0.1%gcc@8.2.0: mpi/openmpi-4.0.1
+       openmpi@4.0.2%gcc@9.2.0: mpi/openmpi-4.0.2
     buildable: False
   hpcx: 
-    modules:
-       hpcx@2.4.1: mpi/hpcx-v2.4.1
-    buildable: False
+#    modules:
+#       hpcx@2.5.0: mpi/hpcx-v2.5.0
+#       hpcx@2.5.0: /opt/hpcx-v2.5.0-gcc-MLNX_OFED_LINUX-4.7-1.0.0.1-redhat7.6-x86_64/modulefiles/hpcx
+#    buildable: False
   elpa:
-    variants: +openmp
+    variants: +openmp +optflags
   intel-mkl:
-    variants: threads=openmp
+    variants: threads=openmp +shared ~ilp64
+  quantum-espresso:
+    variants: +openmp +mpi hdf5=parallel
