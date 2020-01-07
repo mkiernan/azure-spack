@@ -1,6 +1,7 @@
 #!/bin/bash
-#SPACKINSTALLDIR=`pwd`
-SPACKINSTALLDIR=/shared/spack
+SPACKINSTALLDIR=`pwd`
+#-- change to location you prefer
+#SPACKINSTALLDIR=/shared/spack
 pushd $SPACKINSTALLDIR
 git clone https://github.com/spack/spack.git
 # hack for missing clzero flg on HB60rs https://github.com/spack/spack/issues/12896
@@ -17,6 +18,7 @@ popd
 #-- set default compiler & package files
 #wget https://raw.githubusercontent.com/mkiernan/azure-spack/master/compilers.yaml
 #wget https://raw.githubusercontent.com/mkiernan/azure-spack/master/packages.yaml
+#wget https://raw.githubusercontent.com/mkiernan/azure-spack/master/modules.yaml
 mkdir -p ~/.spack/linux
 cp compilers.yaml ~/.spack/linux
 cp packages.yaml ~/.spack
