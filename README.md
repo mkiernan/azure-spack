@@ -29,5 +29,5 @@ More details on spack <a href="https://spack.readthedocs.io">here</a>
 ## Known Issues:
 
 1) Anything using Intel MPI 2019 must be built with -dirty to pickup libfabric from the modulefile until intel-mpi spack package is fixed for 2019/2020
-2) HPCX package is waiting on a fix to source the built-in modulefile
-3) Intel MPI 2018 & 2019 support up to gcc@8.2.0 (mainly for fortran dependent builds like hdf5)
+2) HPCX package is waiting on a fix to source the built-in modulefile, so you need to create a stub package to build dependents and then just module load the system hpc-x module to build with -dirty. 
+3) Intel MPI 2018 & 2019 support up to gcc@8.2.0 (mainly for fortran dependent builds like hdf5), which makes it tricky since system provides 9.2.0, so the script installs gcc@8.2.0 for certain combos. 
