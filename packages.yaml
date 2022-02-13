@@ -1,10 +1,12 @@
 packages:
   all:
-    compiler: [gcc@9.2.0, intel]
+    compiler: [gcc@9.2.0, intel, aocc]
     providers:
       mpi: [mvapich2, intel-mpi, hpcx-mpi, openmpi]
       blas: [intel-mkl, openblas, amdblis]
       lapack: [intel-mkl, openblas]
+  aocc:
+    variants: +license-agreed
   hdf5:
     variants: +cxx +fortran +szip +threadsafe +mpi +hl
   netcdf-c:
@@ -20,7 +22,9 @@ packages:
   intel-mkl:
     variants: threads=openmp
   amdblis:
-    variants: +openmp
+    variants: threads=openmp
+  amdlibflame: 
+    variants: threads=openmp
 #  ncurses:
 #    variants: ccflags="-std=c++11"
 #-- module environments don't seem to pick up paths correctly

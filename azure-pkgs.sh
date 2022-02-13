@@ -67,24 +67,26 @@ declare -a failed
 #-- duplicate lines if you want multiple package versions
 compilers=(
     %gcc@9.2.0
+    %aocc@3.2.0
 #    %intel@18.0.5
 #    %intel@19.0.5
 )
 #-- mpi: use the Azure HPC image pre-installed modules were possible - see packages.yaml
 #-- using azure modules from /opt: openmpi, mvapich2, hpcx, intelmpi
 mpis=(
-#    openmpi@4.1.0
-#    mvapich2@2.3.5
-#    intel-mpi@2018.4.274
-#    intel-mpi@2021.2.0
+    openmpi@4.1.0
+    mvapich2@2.3.5
+    intel-mpi@2018.4.274
+#   intel-mpi@2021.2.0
     hpcx-mpi@2.8.3
-#    mpich@3.3.2
+#   mpich@3.3.2
 )
+
 maths=(
      intel-mkl@2020.4.304
-     amdblis@3.1
-     amdfftw@3.1
+     amdblis@3.1 #-- gcc@9.2.0 install for hpl+hpcx
 )
+
 declare -A foundations=(
     [libszip@2.1.1]=serial
     [hdf5@1.12.1]=parallel
@@ -104,11 +106,14 @@ declare -A quantum_espresso=(
 
 #-- apply these only to specific codes
 arch=`spack arch -t`
-if [[ "$arch" == "zen" || "$arch" == "zen2" ]]; then 
+#if [[ "$arch" == "zen" || "$arch" == "zen2" ]]; then 
+if [ "$arch" == "zen" ]; then 
    #opt='cflags="-O3 -march=core-avx2" cxxflags="-O3 -march=core-avx2" fflags="-O3 -march=core-avx2"'
    #opt="cflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2'"
    #-- gcc options
    #opt="cflags='-O3 -march=native -fopenmp' cxxflags='-O3 -march=native -fopenmp' fflags='-O3 -march=native -fopenmp'"
+   opt="cflags='-O3 -march=znver1 -fopenmp' cxxflags='-O3 -march=znver1 -fopenmp' fflags='-O3 -march=znver1 -fopenmp'"
+elif [ "$arch" == "zen2" ]; then 
    opt="cflags='-O3 -march=znver2 -fopenmp' cxxflags='-O3 -march=znver2 -fopenmp' fflags='-O3 -march=znver2 -fopenmp'"
 elif [ "$arch" == "skylake" ]; then
    opt='cflags="-O3 -march=skylake-avx512 -mtune=skylake-avx512"'
@@ -162,6 +167,13 @@ install_compilers()
     #ARCH=`spack arch`
     #spack load gcc@9.2.0 arch=${ARCH}
 
+    #-- install AMD compiler from spack package 
+    AWD=`pwd`
+    spack install aocc@3.2.0 
+    spack cd -i aocc@3.2.0
+    spack compiler add $PWD
+    cd $AWD
+
     cmd="spack compiler find"; execho "$cmd"
     if [ $dryrun -eq 0 ]; then spack compilers; fi
     if [ $dryrun -eq 0 ]; then functiontimer "install_compilers()"; fi
@@ -193,6 +205,22 @@ install_mathlibs()
     if [ $dryrun -eq 0 ]; then functiontimer "install_mathlibs()"; fi
 
 } #-- end of install_mathlibs() --#
+
+install_amdlibs()
+{
+    #-- https://developer.amd.com/spack/amd-optimized-cpu-libraries/
+    compiler="%aocc@3.2.0"
+    echo "############# amd aocl packages ##################"
+    cmd="spack install amdblis@3.1 $compiler"; execho "$cmd"
+    cmd="spack install amdlibflame@3.1 ^amdblis@3.1 $compiler"; execho "$cmd"
+    cmd="spack install amdfftw@3.1+amd-fast-planner precision=float,double $compiler"; execho "$cmd"
+    cmd="spack install amdscalapack@3.1 ^amdblis@3.1 ^amdlibflame@3.1 $compiler"; execho "$cmd"
+    cmd="spack install amdlibm@3.1 $compiler"; execho "$cmd"
+    cmd="spack install aocl-sparse@3.1 $compiler"; execho "$cmd"
+
+    if [ $dryrun -eq 0 ]; then functiontimer "install_amdlibs()"; fi
+
+} #-- end of install_amdlibs() --#
 
 install_microbenchmarks()
 {
@@ -302,6 +330,7 @@ summarize()
 install_compilers
 install_mpis
 install_mathlibs
+install_amdlibs
 install_microbenchmarks
 install_foundation_libraries
 #install_quantum_espresso

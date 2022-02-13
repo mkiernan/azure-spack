@@ -6,4 +6,4 @@ modules:
         '^mvapich2': mvapich2
         '^intel-mpi': intelmpi
         '^mpich': mpich
-        '^hpx': hpx
+        '^hpx-mpi': hpx-mpi
