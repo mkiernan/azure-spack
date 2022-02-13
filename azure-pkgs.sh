@@ -66,48 +66,50 @@ declare -a failed
 #-- note: just hash out the lines you don't want
 #-- duplicate lines if you want multiple package versions
 compilers=(
-    %gcc@8.2.0
     %gcc@9.2.0
-    %intel@18.0.5
-    %intel@19.0.5
+#    %intel@18.0.5
+#    %intel@19.0.5
 )
-#-- mpi: use the Azure CentOS HPC image pre-installed modules were possible - see packages.yaml
-#-- using azure modules: openmpi, mvpich2
-#-- using builtin spack: mpich (or perhaps consider mpich deprecated and leave it hashed out). 
-#-- broken: hpcx@2.5.0 & intel-mpi@2019 (issues open on spack github)
+#-- mpi: use the Azure HPC image pre-installed modules were possible - see packages.yaml
+#-- using azure modules from /opt: openmpi, mvapich2, hpcx, intelmpi
 mpis=(
-    openmpi@4.0.2
-    mvapich2@2.3.2
-    intel-mpi@2018.4.274
-#    intel-mpi@2019.5.281
-    mpich@3.3.2
+#    openmpi@4.1.0
+#    mvapich2@2.3.5
+#    intel-mpi@2018.4.274
+#    intel-mpi@2021.2.0
+    hpcx-mpi@2.8.3
+#    mpich@3.3.2
 )
-mkls=(
-    intel-mkl@2019.5.281
-    intel-mkl@2018.4.274
+maths=(
+     intel-mkl@2020.4.304
+     amdblis@3.1
+     amdfftw@3.1
 )
 declare -A foundations=(
     [libszip@2.1.1]=serial
-    [hdf5@1.10.5]=parallel
-    [netcdf-c@4.7.3]=parallel
-    [netcdf-fortran@4.5.2]=parallel
+    [hdf5@1.12.1]=parallel
+    [netcdf-c@4.8.1]=parallel
+    [netcdf-fortran@4.5.3]=parallel
 )
 declare -A benchmarks=(
     [stream@5.10]=serial
-    [osu-micro-benchmarks@5.6.2]=parallel
-    [ior@3.2.0]=parallel
+    [osu-micro-benchmarks@5.7.1]=parallel
+    [ior@3.3.0]=parallel
     [hpl@2.3]=parallel
 )
 declare -A quantum_espresso=(
-    [elpa@2019.05.002]=parallel
-    [quantum-espresso@6.5]=parallel
+    [elpa@2021.11.001]=parallel
+    [quantum-espresso@7.0]=parallel
 )
 
 #-- apply these only to specific codes
 arch=`spack arch -t`
 if [[ "$arch" == "zen" || "$arch" == "zen2" ]]; then 
    #opt='cflags="-O3 -march=core-avx2" cxxflags="-O3 -march=core-avx2" fflags="-O3 -march=core-avx2"'
-   opt="cflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2'"
+   #opt="cflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2'"
+   #-- gcc options
+   #opt="cflags='-O3 -march=native -fopenmp' cxxflags='-O3 -march=native -fopenmp' fflags='-O3 -march=native -fopenmp'"
+   opt="cflags='-O3 -march=znver2 -fopenmp' cxxflags='-O3 -march=znver2 -fopenmp' fflags='-O3 -march=znver2 -fopenmp'"
 elif [ "$arch" == "skylake" ]; then
    opt='cflags="-O3 -march=skylake-avx512 -mtune=skylake-avx512"'
 fi
@@ -160,10 +162,6 @@ install_compilers()
     #ARCH=`spack arch`
     #spack load gcc@9.2.0 arch=${ARCH}
 
-    #-- install additional compiler as intel-mpi 2018 is stuck at gcc@8.2.0
-    #-- can't build hdf5/netcdf with intel-mpi@2018 & >gcc@8.2.0
-    cmd="spack install gcc@8.2.0"; execho "$cmd"
-    cmd="spack load gcc@8.2.0"; execho "$cmd"
     cmd="spack compiler find"; execho "$cmd"
     if [ $dryrun -eq 0 ]; then spack compilers; fi
     if [ $dryrun -eq 0 ]; then functiontimer "install_compilers()"; fi
@@ -177,7 +175,7 @@ install_mpis()
     compiler="%gcc@9.2.0"
     for mpi in "${mpis[@]}"
     do
-        cmd="spack install $mpi $compiler"; execho "$cmd" 
+        cmd="spack install $mpi $compiler $opt"; execho "$cmd" 
     done
     if [ $dryrun -eq 0 ]; then functiontimer "install_mpis()"; fi
 
@@ -188,9 +186,9 @@ install_mathlibs()
     echo "############## mathlib packages ##################"
     #-- installing mpi's only for default gcc@9.2.0
     compiler="%gcc@9.2.0"
-    for mkl in "${mkls[@]}"
+    for mathlib in "${maths[@]}"
     do
-        cmd="spack install $mkl $compiler"; execho "$cmd"
+        cmd="spack install $mathlib $compiler $opt"; execho "$cmd"
     done
     if [ $dryrun -eq 0 ]; then functiontimer "install_mathlibs()"; fi
 
@@ -214,7 +212,12 @@ install_microbenchmarks()
            info "$compiler && $mpi"
            for benchmark in "${!benchmarks[@]}"; do
                if [ ${benchmarks[$benchmark]} == "parallel" ]; then
-                   cmd="spack install $benchmark $compiler $opt ^$mpi"; execho "$cmd"
+                   #-- hpl with hpcx does not work with mkl, so use amdblis 
+                   if [ $benchmark == "hpl@2.3" ] && [ $mpi == hpcx-mpi@2.8.3 ]; then
+                        cmd="spack install $benchmark $compiler $opt ^$mpi ^amdblis@3.1"; execho "$cmd"
+                   else 
+                        cmd="spack install $benchmark $compiler $opt ^$mpi"; execho "$cmd"
+                   fi
                fi
            done
        done
@@ -257,11 +260,11 @@ install_quantum_espresso()
     do
        for mpi in "${mpis[@]}"
        do
-           for mkl in "${mkls[@]}"
+           for mathlib in "${maths[@]}"
            do
-               info "$compiler && $mpi && $mkl"
-               cmd="spack install elpa@2019.05.002 $compiler $opt ^$mkl ^$mpi"; execho "$cmd"
-               cmd="spack install quantum-espresso@6.5 $compiler $opt +elpa+scalapack ^$mkl ^$mpi"; execho "$cmd"
+               info "$compiler && $mpi && $mathlib"
+               cmd="spack install elpa@2019.05.002 $compiler $opt ^$mathlib ^$mpi"; execho "$cmd"
+               cmd="spack install quantum-espresso@6.5 $compiler $opt +elpa+scalapack ^$mathlib ^$mpi"; execho "$cmd"
            done
        done
     done
@@ -299,9 +302,9 @@ summarize()
 install_compilers
 install_mpis
 install_mathlibs
-install_foundation_libraries
 install_microbenchmarks
-install_quantum_espresso
+install_foundation_libraries
+#install_quantum_espresso
 
 #-- if live run complete, summarize & exit
 if [ $dryrun -eq 0 ]; then summarize; fi
