@@ -3,16 +3,11 @@
 #
 # Spack Package Installation Script for Azure CentOS HPC Images
 # Author Mike Kiernan, Microsoft
-# Tested On: CentOS-HPC 7.6 & 7.7
+# Tested On: CentOS-HPC 7.9
 # PREREQ: make sure you've installed spack with azure-spack.sh first
 #
 ################################################################################
 # KNOWN ISSUES:
-# 1) Anything using Intel MPI 2019 must be built with -dirty to pickup libfabric
-#    from the modulefile until intel-mpi spack package is fixed for 2019/2020
-# 2) HPCX package is waiting on a fix to source the built-in modulefile
-# 3) Intel MPI 2018 & 2019 support up to gcc@8.2.0 (mainly for fortran 
-#    dependent builds like hdf5)
 ################################################################################
 
 #-- ensure spack env is set
@@ -67,15 +62,15 @@ declare -a failed
 #-- duplicate lines if you want multiple package versions
 compilers=(
     %gcc@9.2.0
-    %aocc@3.2.0
+#    %aocc@3.2.0
 #    %intel@18.0.5
 #    %intel@19.0.5
 )
 #-- mpi: use the Azure HPC image pre-installed modules were possible - see packages.yaml
 #-- using azure modules from /opt: openmpi, mvapich2, hpcx, intelmpi
 mpis=(
-    openmpi@4.1.0
-    mvapich2@2.3.5
+#    openmpi@4.1.0
+#    mvapich2@2.3.5
     intel-mpi@2018.4.274
 #   intel-mpi@2021.2.0
     hpcx-mpi@2.8.3
@@ -114,7 +109,8 @@ if [ "$arch" == "zen" ]; then
    #opt="cflags='-O3 -march=native -fopenmp' cxxflags='-O3 -march=native -fopenmp' fflags='-O3 -march=native -fopenmp'"
    opt="cflags='-O3 -march=znver1 -fopenmp' cxxflags='-O3 -march=znver1 -fopenmp' fflags='-O3 -march=znver1 -fopenmp'"
 elif [ "$arch" == "zen2" ]; then 
-   opt="cflags='-O3 -march=znver2 -fopenmp' cxxflags='-O3 -march=znver2 -fopenmp' fflags='-O3 -march=znver2 -fopenmp'"
+   #opt="cflags='-O3 -march=znver2 -fopenmp' cxxflags='-O3 -march=znver2 -fopenmp' fflags='-O3 -march=znver2 -fopenmp'"
+   opt="cflags='-O3 -march=native -fopenmp' cxxflags='-O3 -march=native -fopenmp' fflags='-O3 -march=native -fopenmp'"
 elif [ "$arch" == "skylake" ]; then
    opt='cflags="-O3 -march=skylake-avx512 -mtune=skylake-avx512"'
 fi
@@ -330,7 +326,7 @@ summarize()
 install_compilers
 install_mpis
 install_mathlibs
-install_amdlibs
+#install_amdlibs
 install_microbenchmarks
 install_foundation_libraries
 #install_quantum_espresso
